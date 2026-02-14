@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Absensi Guru & Karyawan</title>
+    <link rel="icon" href="images/Logo SD QU KUTTAB ZAD.jpeg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="images/Logo SD QU KUTTAB ZAD.jpeg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6f0916">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hidden-section { display: none; }
+        /* Override Tailwind indigo utilities with maroon/maroon-gradient theme */
+        .bg-indigo-600 {
+            background: linear-gradient(90deg,#6f0916,#4a0510) !important;
+        }
+        .hover\:bg-indigo-700:hover {
+            background: linear-gradient(90deg,#5b0414,#3e0210) !important;
+        }
+        .text-indigo-600 { color: #6f0916 !important; }
+        .text-indigo-100 { color: rgba(255,240,240,0.95) !important; }
+        .focus\:ring-indigo-500 { --tw-ring-color: rgba(111,9,22,0.5) !important; }
+        .focus\:border-indigo-500 { border-color: #6f0916 !important; }
+        .ring-indigo-500 { box-shadow: 0 0 0 3px rgba(111,9,22,0.25) !important; }
+        /* Button shadow variants keep using existing utility classes but colors overridden above */
+        /* Background image settings: set your image at --app-bg-url */
+        :root {
+            /* change the URL below to your background image path */
+            --app-bg-url: url(images/gedungsd.jpeg);
+            --app-bg-overlay: rgba(255,255,255,0.75);
+        }
+
+        /* Apply background image to the page */
+        body {
+            background-image: var(--app-bg-url);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        /* Optional light overlay for readability; change variable above to adjust
+           Overlay will be placed behind main content via z-index rules below */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: var(--app-bg-overlay);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ensure main app content and nav appear above the overlay */
+        nav, #appContainer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Ensure the white card (form) is above overlay and nav if needed */
+        .bg-white {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Dropdown hover styles: make select and option hover match maroon gradient */
+        select:hover, select:focus {
+            background: linear-gradient(90deg,#6f0916,#4a0510) !important;
+            color: #ffffff !important;
+        }
+
+        /* Styling option hover (note: browser support varies) */
+        select option:hover {
+            background: linear-gradient(90deg,#6f0916,#4a0510) !important;
+            color: #ffffff !important;
+        }
+
+        /* When an option is selected keep the select text visible */
+        select option:checked {
+            background: linear-gradient(90deg,#6f0916,#4a0510) !important;
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-center">
+            <span class="text-xl font-bold text-indigo-600">🏫 E-Absensi Sekolah KUTTAB ZAD</span>
+        </div>
+    </nav>
+
+    <div id="appContainer" class="max-w-xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+            <div class="bg-indigo-600 px-6 py-6">
+    <div class="flex flex-col sm:flex-row items-center sm:justify-between text-center sm:text-left">
+        
+        <!-- Logo Kiri -->
+        <img src="images/Logo SD QU KUTTAB ZAD.jpeg"
+             class="w-12 h-12 object-contain rounded-full mb-2 sm:mb-0">
+
+        <!-- Teks Tengah -->
+        <div class="flex-1 sm:text-center">
+            <h2 class="text-white text-lg sm:text-xl font-semibold">
+                Absensi Harian
+            </h2>
+            <p class="text-indigo-100 text-xs sm:text-sm mt-1">
+                Silakan isi kehadiran Anda dengan benar
+            </p>
+        </div>
+
+        <!-- Logo Kanan (Hanya Desktop) -->
+        <img src="images/WhatsApp Image 2025-07-29 at 16.53.14.jpeg"
+             class="hidden sm:block w-12 h-12 object-contain rounded-full">
+    </div>
+</div>
+
+            
+            <form id="attendanceForm" class="p-6 space-y-5" onsubmit="submitAttendance(event)">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email (gunakan email terdaftar)</label>
+                    <input type="email" id="emailInput" placeholder="email@contoh.com" required class="w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-gray-50 mb-2" />
+                    <p id="emailMessage" class="text-xs text-red-600 mt-1">Masukkan email terdaftar untuk melakukan absensi.</p>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-1 mt-4">Nama Lengkap</label>
+                    <select id="employeeName" required class="w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-gray-50 outline-none transition-all">
+                        <option value="" disabled selected>-- Pilih Nama Anda --</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" id="dateInput" required class="w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jam</label>
+                        <input type="time" id="timeInput" required class="w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    </div>
+                </div>
+
+                <div class="">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status Kehadiran</label>
+                    <select id="statusInput" onchange="handleStatusChange()" class="w-full rounded-lg border-gray-300 shadow-sm p-3 border focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                        <option value="">-- Pilih Status --</option>
+                        <option value="Hadir">✅ Hadir</option>
+                        <option value="Sakit">🤒 Sakit</option>
+                        <option value="Cuti">✈️ Izin Cuti</option>
+                    </select>
+                        <p id="gpsNote" class="text-xs text-gray-500 mt-2 hidden-section">pastikan GPS aktif dan izinkan akses lokasi saat diminta browser</p>
+                </div>
+
+                <div id="section-cuti" class="hidden-section bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <label class="block text-sm font-medium text-yellow-800 mb-1">Urutan Cuti</label>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm text-gray-600">Cuti ke-</span>
+                        <input type="number" id="leaveCount" min="1" placeholder="1" class="w-24 rounded-lg border-gray-300 shadow-sm p-2 border">
+                        <span class="ml-2 text-sm text-gray-600">semester ini</span>
+                    </div>
+                    <div id="leaveWarning" class="hidden-section mt-3">
+                        <label class="inline-flex items-start">
+                            <input type="checkbox" id="leaveAcknowledge" class="form-checkbox mt-1 mr-2" />
+                            <span class="text-sm text-red-700">Anda telah melebihi batas cuti yang telah ditentukan, untuk selanjutnya silahkan izin secara langsung ke kepala sekolah.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="section-sakit" class="hidden-section bg-red-50 p-4 rounded-lg border border-red-200 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-red-800 mb-1">Kirim Surat Keterangan Dokter</label>
+                        <input type="file" id="sickLetter" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-100 file:text-red-700 hover:file:bg-red-200">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" id="submitBtn" class="w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-base font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
+                        Simpan Absensi
+                    </button>
+                </div>
+                
+            </form>
+        </div>
+        <p class="text-center text-indigo-600 text-xs mt-6">Sistem Absensi Internal Sekolah &copy; by Sigit Ramadhan, S.Pd 2026</p>
+    </div>
+
+    <script>
+        // --- 1. CONFIGURATION ---
+        // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE ANDA
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby9uPVNAxzuPQFphRxZ-QyQnKGMsQPf5TD0P8jZTPs8jU0_cUbFn0wJB7_fn_nkNvi6bQ/exec";
+
+        // Koordinat Sekolah
+        const SCHOOL_LOCATION = {
+            latitude: -6.761311881809554,
+            longitude: 107.05499815219878,
+            name: "Sekolah KUTTAB ZAD"
+        };
+        const ALLOWED_DISTANCE = 100; // Jarak dalam meter (100m)
+
+        const employees = [
+            "Sigit Ramadhan, S.Pd (Kepala SD Kuttab)",
+            "Nadila Khairunnisa AP, S.Pd (Kepala Sekolah TK)",
+            "Arini Nurhanifah, Lc (Waka. Kurikulum)",
+            "Nizma Rifdah Nur Arifah, S.S (Waka. Kesiswaan)",
+            "Bardila Sab'a  Maharrami, B.A (Walas 5A)",
+            "Nadhira Fairuzana,  S.Ag (Walas 5B)",
+            "Muhammad Naufal Ridhwan (Walas 5C)",
+            "Farihah Ariqoh Faiqoh  Sabatini, S.Ag (Walas 4A)",
+            "Afifah Nur, S.Ag (Walas 4B)",
+            "Hayatunnasuha, S.Ag (Walas 4C)",
+            "Nurlaila Sopia, S.Pd (Walas  3)",
+            "Santi Yuliana Aprilianti (Walas 2A)",
+            "Ulfa Hasanah, S.Pd (Walas 2B)",
+            "Azka Al Karimah, S.Pd, S.Ag (Walas  1A)",
+            "Bella Charisma (Walas 1B)",
+            "Sarwada (Walas 1C)",
+            "Salsabila Rahma Dina (Guru TK)",
+            "Salsabila Maulida (Guru TK)",
+            "Nurul Novtiani Sari, S.Pd (Staff TU)",
+            "Nayla (Staff TU)",
+            "Siti Nurjanah (Staff Kebersihan)",
+            "Rina Mardiana (Staff Kebersihan)",
+            "Yanyan  Rohyani (Maintenence)"
+        ];
+
+        // Populasikan Dropdown Nama
+        const selectEl = document.getElementById('employeeName');
+        employees.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            selectEl.appendChild(option);
+        });
+
+        // Mapping email -> single allowed name. Edit entries here (keys must be lowercase).
+        const emailToName = {
+            "sigit.ramadhan19@gmail.com": "Sigit Ramadhan, S.Pd (Kepala SD Kuttab)"
+            // tambahkan pasangan "email": "Nama Lengkap (Jabatan)" di sini
+        };
+
+        const emailInput = document.getElementById('emailInput');
+        const emailMessage = document.getElementById('emailMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function handleEmailChange() {
+            const email = (emailInput.value || '').trim().toLowerCase();
+            if (!email) {
+                emailMessage.textContent = 'Masukkan email terdaftar.';
+                emailMessage.classList.remove('text-green-600');
+                emailMessage.classList.add('text-red-600');
+                selectEl.value = '';
+                selectEl.disabled = true;
+                submitBtn.disabled = true;
+                return;
+            }
+            const allowed = emailToName[email];
+            if (allowed) {
+                // pastikan opsi ada
+                let found = false;
+                for (let i = 0; i < selectEl.options.length; i++) {
+                    if (selectEl.options[i].value === allowed) { found = true; break; }
+                }
+                if (!found) {
+                    const option = document.createElement('option');
+                    option.value = allowed;
+                    option.textContent = allowed;
+                    selectEl.appendChild(option);
+                }
+                selectEl.value = allowed;
+                selectEl.disabled = true;
+                emailMessage.textContent = 'Email terverifikasi untuk: ' + allowed;
+                emailMessage.classList.remove('text-red-600');
+                emailMessage.classList.add('text-green-600');
+                submitBtn.disabled = false;
+            } else {
+                emailMessage.textContent = 'Email tidak terdaftar atau tidak diizinkan mengisi.';
+                emailMessage.classList.remove('text-green-600');
+                emailMessage.classList.add('text-red-600');
+                selectEl.value = '';
+                selectEl.disabled = true;
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Inisialisasi terkunci sampai email diverifikasi
+        selectEl.disabled = true;
+        submitBtn.disabled = true;
+        emailInput.addEventListener('input', () => {
+            emailMessage.textContent = '';
+            selectEl.value = '';
+            selectEl.disabled = true;
+            submitBtn.disabled = true;
+        });
+        emailInput.addEventListener('change', handleEmailChange);
+        emailInput.addEventListener('blur', handleEmailChange);
+
+        // Set Waktu Otomatis ke Waktu Sekarang
+        document.getElementById('dateInput').valueAsDate = new Date();
+        document.getElementById('timeInput').value = new Date().toTimeString().substring(0,5);
+
+        // Prevent selecting past dates/times: set minimums and enforce on change
+        const dateInput = document.getElementById('dateInput');
+        const timeInput = document.getElementById('timeInput');
+        const leaveCountInput = document.getElementById('leaveCount');
+        const leaveWarning = document.getElementById('leaveWarning');
+        const leaveAck = document.getElementById('leaveAcknowledge');
+
+        function formatDateYYYYMMDD(d) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function updateTimeMinForSelectedDate() {
+            const now = new Date();
+            const todayStr = formatDateYYYYMMDD(now);
+            const selectedDateStr = dateInput.value;
+
+            if (!selectedDateStr) return;
+
+            if (selectedDateStr === todayStr) {
+                // If selecting today, time min is current time (HH:MM)
+                const hhmm = now.toTimeString().substring(0,5);
+                timeInput.setAttribute('min', hhmm);
+                // If current selected time is already in the past, bump it to min
+                if (timeInput.value < hhmm) timeInput.value = hhmm;
+            } else {
+                // Future dates: allow any time
+                timeInput.setAttribute('min', '00:00');
+            }
+        }
+
+        // Set earliest selectable date to today
+        dateInput.setAttribute('min', formatDateYYYYMMDD(new Date()));
+        // Update time min on load in case date is today
+        updateTimeMinForSelectedDate();
+        // Update when the user changes the date
+        dateInput.addEventListener('change', updateTimeMinForSelectedDate);
+        // Also ensure time change cannot be set below min
+        timeInput.addEventListener('change', () => {
+            const min = timeInput.getAttribute('min') || '00:00';
+            if (timeInput.value < min) timeInput.value = min;
+        });
+
+
+        // Handle leave count changes and show warning when > 4
+        function checkLeaveCount() {
+            if (!leaveCountInput) return;
+            const val = parseInt(leaveCountInput.value || '0', 10);
+            if (val > 4) {
+                if (leaveWarning) leaveWarning.style.display = 'block';
+                // disable submit until acknowledge
+                document.getElementById('submitBtn').disabled = !(leaveAck && leaveAck.checked);
+            } else {
+                if (leaveWarning) leaveWarning.style.display = 'none';
+                if (leaveAck) leaveAck.checked = false;
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        if (leaveCountInput) leaveCountInput.addEventListener('input', checkLeaveCount);
+        if (leaveAck) leaveAck.addEventListener('change', () => {
+            // toggle submit when ack changes
+            const val = parseInt(leaveCountInput.value || '0', 10);
+            if (val > 4) document.getElementById('submitBtn').disabled = !(leaveAck && leaveAck.checked);
+        });
+
+        // --- 2. GEOLOCATION FUNCTION ---
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            // Haversine Formula untuk menghitung jarak antara dua koordinat GPS
+            const R = 6371000; // Radius bumi dalam meter
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c; // Jarak dalam meter
+        }
+
+        async function checkGeolocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject('Browser Anda tidak mendukung geolocation');
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const userLat = position.coords.latitude;
+                        const userLon = position.coords.longitude;
+                        const distance = calculateDistance(
+                            userLat, userLon,
+                            SCHOOL_LOCATION.latitude,
+                            SCHOOL_LOCATION.longitude
+                        );
+                        resolve({ distance, userLat, userLon });
+                    },
+                    (error) => {
+                        reject('Tidak dapat mengakses lokasi. Pastikan izin lokasi sudah diberikan.');
+                    }
+                );
+            });
+        }
+
+        // --- 3. UI LOGIC ---
+        function handleStatusChange() {
+            const status = document.getElementById('statusInput').value;
+            const sectionCuti = document.getElementById('section-cuti');
+            const sectionSakit = document.getElementById('section-sakit');
+            const gpsNote = document.getElementById('gpsNote');
+
+            sectionCuti.style.display = (status === 'Cuti') ? 'block' : 'none';
+            sectionSakit.style.display = (status === 'Sakit') ? 'block' : 'none';
+            // No Datang/Pulang input anymore — users submit once at arrival.
+            // Show GPS note only when Hadir
+            if (gpsNote) gpsNote.style.display = (status === 'Hadir') ? 'block' : 'none';
+        }
+
+        // Ensure correct initial visibility on load
+        document.addEventListener('DOMContentLoaded', () => {
+            handleStatusChange();
+        });
+
+        // --- 4. DATA SUBMISSION ---
+        async function submitAttendance(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBtn');
+            const originalText = btn.innerText;
+
+            // Ambil Nilai Status terlebih dahulu
+            const status = document.getElementById('statusInput').value;
+            const name = document.getElementById('employeeName').value;
+            const date = document.getElementById('dateInput').value;
+            const time = document.getElementById('timeInput').value;
+
+            // Tampilkan Loading
+            btn.innerText = "⏳ Memproses...";
+            btn.disabled = true;
+
+            try {
+               // Prevent submitting a past datetime (dengan toleransi 2 menit)
+            const selectedDateTime = new Date(date + 'T' + time);
+            const now = new Date();
+
+            const tolerance = 2 * 60 * 1000; // 2 menit dalam milidetik
+
+            if (selectedDateTime.getTime() < (now.getTime() - tolerance)) {
+                alert('❌ Waktu yang dipilih sudah lewat lebih dari 2 menit.\nSilakan pilih waktu sekarang.');
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+}
+
+
+                // Cek Geolocation hanya jika status Hadir
+                if (status === 'Hadir') {
+                    btn.innerText = "📍 Memeriksa lokasi...";
+                    const geoData = await checkGeolocation();
+                    
+                    if (geoData.distance > ALLOWED_DISTANCE) {
+                        alert(`❌ Gagal!\n\nAnda berada terlalu jauh dari sekolah.\nJarak: ${Math.round(geoData.distance)}m (Batas: ${ALLOWED_DISTANCE}m)\n\nAbsensi hanya dapat dilakukan di dalam area sekolah.`);
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+                    btn.innerText = "⏳ Memproses...";
+                }
+
+                // type removed; for Hadir we mark as 'Datang' by default
+                const type = (status === 'Hadir') ? 'Datang' : '-';
+
+                let details = "-";
+                let fileData = null;
+                let fileName = null;
+
+                if (status === 'Cuti') {
+                    const leaveCountVal = parseInt(document.getElementById('leaveCount').value || '1', 10);
+                    details = `Cuti ke-${leaveCountVal}`;
+                    // Jika melebihi 4, pastikan acknowledge dicentang
+                    if (leaveCountVal > 4) {
+                        const ack = document.getElementById('leaveAcknowledge');
+                        if (!ack || !ack.checked) {
+                            alert('Anda memilih cuti lebih dari 4. Mohon centang konfirmasi pada pesan yang muncul atau hubungi kepala sekolah.');
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                            return;
+                        }
+                    }
+                } else if (status === 'Sakit') {
+                    const fileInput = document.getElementById('sickLetter');
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        fileName = file.name;
+                        // Jangan set details untuk sakit dengan file, biarkan server handle
+                        
+                        // Baca file sebagai Base64
+                        fileData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                resolve(reader.result.split(',')[1]); // Ambil bagian base64 saja
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(file);
+                        });
+                    } else {
+                        details = "Sakit (Belum ada lampiran)";
+                    }
+                } else {
+                    // Cek Keterlambatan
+                    const [hours, minutes] = time.split(':').map(Number);
+                    const timeInMinutes = hours * 60 + minutes;
+                    const standardTime = 7 * 60 + 30; // 07:30
+                    
+                    if (timeInMinutes > standardTime) {
+                        details = "Anda terlambat";
+                    } else {
+                        details = "Hadir tepat waktu";
+                    }
+                }
+
+                // Hitung waktu pulang terjadwal (hanya untuk Hadir)
+                let scheduledExit = "";
+                if (status === 'Hadir') {
+                    // Gunakan nilai tanggal yang dipilih untuk menentukan hari
+                    // Format input date: YYYY-MM-DD
+                    const dateObj = new Date(date + 'T00:00:00');
+                    const day = dateObj.getDay(); // 0=Sun,1=Mon,...6=Sat
+                    // Senin(1)-Kamis(4) => 15:00, Jumat(5) => 11:00, Sabtu(6) => 11:30
+                    if (day >= 1 && day <= 4) scheduledExit = '15:00';
+                    else if (day === 5) scheduledExit = '11:00';
+                    else if (day === 6) scheduledExit = '11:30';
+                    else scheduledExit = '';
+                }
+
+                const email = (document.getElementById('emailInput').value || '').trim().toLowerCase();
+
+                const record = { name, email, date, time, type, status, details, scheduledExit, fileData, fileName };
+
+                // KIRIM DATA KE GOOGLE SHEETS
+                // NOTE: jangan gunakan mode: 'no-cors' karena akan menyebabkan
+                // body request tidak diteruskan ke Apps Script. Pastikan Web App
+                // dideploy dengan akses "Anyone, even anonymous".
+                const resp = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    // gunakan text/plain agar tidak memicu CORS preflight
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(record)
+                });
+
+                // Coba baca respons (jika tersedia)
+                let respJson = null;
+                try {
+                    respJson = await resp.json();
+                } catch (e) {
+                    // respons opaque atau tidak JSON; abaikan
+                }
+
+                // Sukses
+                let successMessage = `✅ Berhasil!\nTerima kasih ${name}, data absensi telah tersimpan.`;
+                if (status === 'Sakit') {
+                    successMessage = `✅ Berhasil!\nSemoga lekas sembuh ${name}, data absensi telah tersimpan.`;
+                } else if (status === 'Hadir') {
+                    // Cek Keterlambatan pada saat kedatangan
+                    const [hours, minutes] = time.split(':').map(Number);
+                    const timeInMinutes = hours * 60 + minutes;
+                    const standardTime = 7 * 60 + 30; // 07:30
+                    
+                    if (timeInMinutes > standardTime) {
+                        successMessage = `⚠️ Anda terlambat, besok jangan diulangi ya ${name}!`;
+                    }
+                }
+                alert(successMessage);
+                
+                // Reset Form
+                e.target.reset();
+                document.getElementById('dateInput').valueAsDate = new Date();
+                document.getElementById('timeInput').value = new Date().toTimeString().substring(0,5);
+                handleStatusChange();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Gagal terhubung ke server. Pastikan internet Anda aktif.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+    if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("Service Worker Registered"));
+}
+    </script>
+</body>
+</html>
