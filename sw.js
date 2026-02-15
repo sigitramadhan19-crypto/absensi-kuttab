@@ -1,4 +1,4 @@
-const CACHE_NAME = "absensi-kuttab-v6";
+const CACHE_NAME = "absensi-kuttab-v7";
 const urlsToCache = [
   "./",
   "./index.html",
