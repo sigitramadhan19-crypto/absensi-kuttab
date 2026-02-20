@@ -537,7 +537,7 @@
                     // Cek Keterlambatan
                     const [hours, minutes] = time.split(':').map(Number);
                     const timeInMinutes = hours * 60 + minutes;
-                    const standardTime = 7 * 60 + 30; // 07:30
+                    const standardTime = 8 * 60; // 08:00
                     
                     if (timeInMinutes > standardTime) {
                         details = "Anda terlambat";
@@ -554,7 +554,7 @@
                     const dateObj = new Date(date + 'T00:00:00');
                     const day = dateObj.getDay(); // 0=Sun,1=Mon,...6=Sat
                     // Senin(1)-Kamis(4) => 15:00, Jumat(5) => 11:00, Sabtu(6) => 11:30
-                    if (day >= 1 && day <= 4) scheduledExit = '15:00';
+                    if (day >= 1 && day <= 4) scheduledExit = '12:00';
                     else if (day === 5) scheduledExit = '11:00';
                     else if (day === 6) scheduledExit = '11:30';
                     else scheduledExit = '';
