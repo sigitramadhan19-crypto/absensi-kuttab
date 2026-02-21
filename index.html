@@ -591,7 +591,7 @@
                     // Cek Keterlambatan pada saat kedatangan
                     const [hours, minutes] = time.split(':').map(Number);
                     const timeInMinutes = hours * 60 + minutes;
-                    const standardTime = 7 * 60 + 30; // 07:30
+                    const standardTime = 8 * 60; // 08:00
                     
                     if (timeInMinutes > standardTime) {
                         successMessage = `⚠️ Anda terlambat, besok jangan diulangi ya ${name}!`;
