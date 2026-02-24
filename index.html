@@ -463,11 +463,25 @@
                 btn.innerText = originalText;
                 btn.disabled = false;
                 return;
-
             }
             const name = document.getElementById('employeeName').value;
             const date = document.getElementById('dateInput').value;
             const time = document.getElementById('timeInput').value;
+
+            // Batasi jam absensi 06:00 - 09:00
+            if (status === 'Hadir') {
+                const [h, m] = time.split(':').map(Number);
+                const totalMinutes = h * 60 + m;
+                const minTime = 6 * 60;  // 06:00
+                const maxTime = 9 * 60;  // 09:00
+
+            if (totalMinutes < minTime || totalMinutes > maxTime) {
+                alert("❌ Absensi hanya bisa dilakukan antara pukul 06.00 - 09.00 WIB.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+                return;
+            }
+            }
 
             // Tampilkan Loading
             btn.innerText = "⏳ Memproses...";
@@ -485,7 +499,7 @@
                 btn.innerText = originalText;
                 btn.disabled = false;
                 return;
-}
+            }
 
 
                 // Cek Geolocation hanya jika status Hadir
@@ -542,16 +556,8 @@
                         details = "Sakit (Belum ada lampiran)";
                     }
                 } else {
-                    // Cek Keterlambatan
-                    const [hours, minutes] = time.split(':').map(Number);
-                    const timeInMinutes = hours * 60 + minutes;
-                    const standardTime = 8 * 60; // 08:00
-                    
-                    if (timeInMinutes > standardTime) {
-                        details = "Anda terlambat";
-                    } else {
-                        details = "Hadir tepat waktu";
-                    }
+                    //Tidak perlu cek keterlambatan di frontend
+
                 }
 
                 // Hitung waktu pulang terjadwal (hanya untuk Hadir)
@@ -592,19 +598,23 @@
                 }
 
                 // Sukses
+                // =======================
+                // SUCCESS MESSAGE CLEAN
+                // =======================
+
                 let successMessage = `✅ Berhasil!\nTerima kasih ${name}, data absensi telah tersimpan.`;
+
                 if (status === 'Sakit') {
                     successMessage = `✅ Berhasil!\nSemoga lekas sembuh ${name}, data absensi telah tersimpan.`;
-                } else if (status === 'Hadir') {
-                    // Cek Keterlambatan pada saat kedatangan
-                    const [hours, minutes] = time.split(':').map(Number);
-                    const timeInMinutes = hours * 60 + minutes;
-                    const standardTime = 8 * 60; // 08:00
-                    
-                    if (timeInMinutes > standardTime) {
+                } 
+                else if (status === 'Hadir' && respJson) {
+                    if (respJson.late) {
                         successMessage = `⚠️ Anda terlambat, besok jangan diulangi ya ${name}!`;
+                    } else {
+                        successMessage = `✅ Terima kasih sudah tepat waktu ${name}`;
                     }
                 }
+
                 alert(successMessage);
                 
                 // Reset Form
