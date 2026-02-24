@@ -220,7 +220,7 @@
             "Salsabila Rahma Dina (Guru TK)",
             "Salsabila Maulida (Guru TK)",
             "Nurul Novtiani Sari, S.Pd (Staff TU)",
-            "Nayla (Staff TU)",
+            "Nayla Zahratul Jannah (Guru Kuttab)",
             "Siti Nurjanah (Staff Kebersihan)",
             "Rina Mardiana (Staff Kebersihan)",
             "Yanyan  Rohyani (Maintenence)"
@@ -464,6 +464,7 @@
                 btn.disabled = false;
                 return;
 
+            }
             const name = document.getElementById('employeeName').value;
             const date = document.getElementById('dateInput').value;
             const time = document.getElementById('timeInput').value;
@@ -474,7 +475,7 @@
 
             try {
                // Prevent submitting a past datetime (dengan toleransi 2 menit)
-            const selectedDateTime = new Date(date + 'T' + time);
+            const selectedDateTime = new Date(`${date}T${time}:00`);
             const now = new Date();
 
             const tolerance = 2 * 60 * 1000; // 2 menit dalam milidetik
